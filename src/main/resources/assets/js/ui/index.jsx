@@ -11,13 +11,10 @@ var Sidebar = React.createClass({
 
     componentDidMount: function() {
         this.serverRequest = $.get(this.props.source, function (result) {
-            var json = this.serverRequest.responseJSON;
-            console.log(json);
-            console.log(result);
             this.setState({
-                currentTemp: json.current,
-                target: json.target,
-                mode: json.mode
+                currentTemp: result.current,
+                target: result.target,
+                mode: result.mode
             });
         }.bind(this));
     },
