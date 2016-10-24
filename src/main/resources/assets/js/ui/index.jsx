@@ -2,7 +2,7 @@ var Sidebar = React.createClass({
     getInitialState: function() {
         return {
             currentTemp: "",
-            targetTemp: "",
+            target: "",
             mode: "",
             weatherTemp: "",
             weatherCond: ""
@@ -11,11 +11,13 @@ var Sidebar = React.createClass({
 
     componentDidMount: function() {
         this.serverRequest = $.get(this.props.source, function (result) {
-            var values = result[0];
+            var json = this.serverRequest.responseJSON;
+            console.log(json);
+            console.log(result);
             this.setState({
-                currentTemp: values.current,
-                targetTemp: values.target,
-                mode: values.mode
+                currentTemp: json.current,
+                target: json.target,
+                mode: json.mode
             });
         }.bind(this));
     },
