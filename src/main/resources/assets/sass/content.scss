@@ -5,7 +5,7 @@
 
   .controls, .log, .schedule, .graph {
     & > div {
-      overflow-x: scroll;
+      overflow-x: hidden;
       background-color: #fff;
       box-shadow: 3px 3px 0 #ccc;
       padding: 30px;

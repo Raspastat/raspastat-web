@@ -12,15 +12,22 @@ var Sidebar = React.createClass({
     componentDidMount: function() {
         this.serverRequest = $.get(this.props.source, function (result) {
             this.setState({
-                currentTemp: result.current,
+                currentTemp: Math.round(result.current),
                 target: result.target,
                 mode: result.mode
+            });
+        }.bind(this));
+        this.weatherRequest = $.get(this.props.weather, function (result) {
+            this.setState({
+                weatherCond: result.weather[0].main,
+                weatherTemp: Math.round(result.main.temp)
             });
         }.bind(this));
     },
 
     componentWillUnmount: function() {
         this.serverRequest.abort();
+        this.weatherRequest.abort();
     },
 
     render: function () {
@@ -28,17 +35,17 @@ var Sidebar = React.createClass({
             <div className="pure-u-1 pure-u-md-1-5 sidebar">
                 <div>
                     <div className="temp">
-                        <h1>{this.state.currentTemp}</h1>
+                        <h1>{this.state.currentTemp}<span>&deg;F</span></h1>
                         <h2>Current Temperature</h2>
                     </div>
-                    <div className="mode heat">
+                    <div className="mode off">
                         <h1>{this.state.mode}</h1>
-                        <h2>Target Temp: {this.state.target}</h2>
+                        <h2>Target Temp: {this.state.target}&deg;F</h2>
                     </div>
                     <div className="weather rain">
                         <h2>Searcy</h2>
                         <h3>{this.state.weatherCond}</h3>
-                        <h1>{this.state.weatherTemp}</h1>
+                        <h1>{this.state.weatherTemp}&deg;F</h1>
                     </div>
                     <div className="details">
                         <a>Show Details</a>
@@ -58,6 +65,49 @@ var Sidebar = React.createClass({
     }
 });
 
+var Control = React.createClass({
+    render: function () {
+        return (
+            <div>
+                <h1>Control</h1>
+                <form className="pure-form pure-form-stacked">
+                    <fieldset className="pure-group">
+                        <input id="username" type="text" placeholder="Username" required/>
+                        <input id="password" type="password" placeholder="Password" required/>
+                    </fieldset>
+                    <label>Temperature</label>
+                    <input id="temp" type="number" placeholder="70" required min="60" max="80"/>
+                    <ControlSubmit/>
+                </form>
+            </div>
+        )
+    }
+});
+
+class ControlSubmit extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {isToggleOn: true};
+
+        // This binding is necessary to make `this` work in the callback
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick() {
+        this.setState(prevState => ({
+            isToggleOn: !prevState.isToggleOn
+        }));
+    }
+
+    render() {
+        return (
+            <button onClick={this.handleClick}>
+                {this.state.isToggleOn ? 'ON' : 'OFF'}
+            </button>
+        );
+    }
+}
+
 var Content = React.createClass({
     render: function () {
         return (
@@ -69,18 +119,7 @@ var Content = React.createClass({
                             <div className="pure-u-1">
                                 <div className="pure-g">
                                     <div className="pure-u-1 pure-u-md-1-3 controls">
-                                        <div>
-                                            <h1>Control</h1>
-                                            <form className="pure-form pure-form-stacked">
-                                                <fieldset className="pure-group">
-                                                    <input id="username" type="text" placeholder="Username" required/>
-                                                    <input id="password" type="password" placeholder="Password" required/>
-                                                </fieldset>
-                                                <label>Temperature</label>
-                                                <input id="temp" type="number" placeholder="70" required min="60" max="80"/>
-                                                <button className="pure-button pure-button-primary">Set</button>
-                                            </form>
-                                        </div>
+                                        <Control />
                                     </div>
                                     <div className="pure-u-1 pure-u-md-2-3 log">
                                         <div>
@@ -379,7 +418,7 @@ var Index = React.createClass({
         return (
             <div className="pure-u-1">
                 <div className="pure-g">
-                    <Sidebar source="http://10.2.90.194:8080/api/status"/>
+                    <Sidebar source="http://10.2.90.194:8080/api/status" weather="http://api.openweathermap.org/data/2.5/weather?zip=72149,us&units=imperial&appid=c1d22aea891556cbea7a69d7c70d04a1"/>
                     <Content />
                 </div>
             </div>
