@@ -1,5 +1,5 @@
 var Sidebar = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {
             currentTemp: "",
             target: "",
@@ -9,7 +9,7 @@ var Sidebar = React.createClass({
         };
     },
 
-    componentDidMount: function() {
+    componentDidMount: function () {
         this.serverRequest = $.get(this.props.source, function (result) {
             this.setState({
                 currentTemp: Math.round(result.current),
@@ -25,7 +25,7 @@ var Sidebar = React.createClass({
         }.bind(this));
     },
 
-    componentWillUnmount: function() {
+    componentWillUnmount: function () {
         this.serverRequest.abort();
         this.weatherRequest.abort();
     },
@@ -87,22 +87,22 @@ var Control = React.createClass({
 class ControlSubmit extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {isToggleOn: true};
-
-        // This binding is necessary to make `this` work in the callback
         this.handleClick = this.handleClick.bind(this);
     }
 
     handleClick() {
-        this.setState(prevState => ({
-            isToggleOn: !prevState.isToggleOn
-        }));
+        var json = {};
+        json.operation = "temp";
+        json.value = document.getElementById("temp").value;
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', "api/set", true);
+        xhr.send(JSON.stringify(json));
     }
 
     render() {
         return (
-            <button onClick={this.handleClick}>
-                {this.state.isToggleOn ? 'ON' : 'OFF'}
+            <button onClick={this.handleClick} type="button">
+                Send
             </button>
         );
     }
@@ -418,7 +418,8 @@ var Index = React.createClass({
         return (
             <div className="pure-u-1">
                 <div className="pure-g">
-                    <Sidebar source="http://10.2.90.194:8080/api/status" weather="http://api.openweathermap.org/data/2.5/weather?zip=72149,us&units=imperial&appid=c1d22aea891556cbea7a69d7c70d04a1"/>
+                    <Sidebar source="http://10.2.90.194:8080/api/status"
+                             weather="http://api.openweathermap.org/data/2.5/weather?zip=72149,us&units=imperial&appid=c1d22aea891556cbea7a69d7c70d04a1"/>
                     <Content />
                 </div>
             </div>
